@@ -12,9 +12,6 @@ const sendUrl = url =>
   });
 export default () => {
   const [url, setUrl] = useState("");
-  const _setUrl = url => {
-    return;
-  };
   return (
     <>
       <TextInput

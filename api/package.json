@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node --experimental-modules -r dotenv/config src/index.js",
-    "dev": "nodemon --exec \"yarn start\" src"
+    "dev": "nodemon --delay 500ms --exec \"yarn start\" src"
   },
   "devDependencies": {
     "eslint": "^5.16.0",
@@ -16,14 +16,15 @@
     "eslint-plugin-node": "^9.1.0",
     "eslint-plugin-promise": "^4.1.1",
     "eslint-plugin-standard": "^4.0.0",
-    "nodemon": "^1.19.1"
+    "nodemon": "^1.19.1",
+    "prettier": "^1.18.2"
   },
   "dependencies": {
     "bluebird": "^3.5.5",
+    "bull": "^3.10.0",
     "dotenv": "^8.0.0",
     "express": "^4.17.1",
     "fluent-ffmpeg": "^2.1.2",
-    "kue": "^0.11.6",
     "mongoose": "^5.5.12",
     "redis": "^2.8.0",
     "sanitize-filename": "^1.6.1",
