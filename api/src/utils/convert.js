@@ -1,6 +1,4 @@
 import Queue from 'bull'
-import ytdl from 'ytdl-core'
-import fs from 'fs'
 import ffmpeg from 'fluent-ffmpeg'
 
 import Video from '../models/Video.js'
@@ -9,7 +7,9 @@ import { audioDir, videoDir } from '../api/index.js'
 const convertQueue = new Queue('convert')
 
 export default async videoId => {
+  console.log('Convert', { videoId })
   const video = await Video.findById(videoId)
+  console.log({ video })
   if (video.status === 'converted') return
   await video.update({
     status: 'queuedForConvert',
@@ -32,29 +32,26 @@ export default async videoId => {
 
 convertQueue.process(async (job, done) => {
   const { videoId } = job.data
+  console.log({ process: videoId })
   const video = await Video.findById(videoId)
+  console.log({ videoId, video })
+  const { videoPath, title } = video
 
-  const videoFile = `${videoDir}/${videoId}.webm`
-  const audioFile = `${audioDir}/${videoId}.webm`
-
-  const inputStream = fs.createReadStream(videoFile)
-
-  inputStream.on('error', job.error)
+  const audioFile = `${audioDir}/${title}.m4a`
 
   await video.update({ audioPath: audioFile, status: 'converting' })
-  ffmpeg(inputStream)
+
+  ffmpeg(videoPath)
+    .noVideo()
+    .audioQuality(5)
     .audioCodec('aac')
     .on('progress', info => {
       console.log({ info })
+      job.progress(+info.percent.toFixed(2))
     })
-    .on('error', job.error)
+    .on('error', err => {
+      console.log({ err })
+    })
+    .on('end', done)
     .save(audioFile)
-
-  ytdl(url, { format: 'webm', filter: 'audioandvideo' })
-    .on('progress', (chunkLength, downloaded, total) => {
-      const progress = (downloaded / total) * 100
-      job.progress(+progress.toFixed(2))
-    })
-    .on('finish', done)
-    .pipe(fs.createWriteStream(videoFile))
 })

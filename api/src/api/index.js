@@ -10,9 +10,8 @@ export const videoDir = `${STORAGE_PATH}/video`
 export const audioDir = `${STORAGE_PATH}/audio`
 
 api.post('/video', async (req, res, next) => {
-  console.log(req.body)
   const { url } = req.body
-
+  console.log(url)
   if (!url) return res.status(400).json({ error: 'url-missing' })
   const video = await download(url)
   console.log({ video, url })
