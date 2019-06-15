@@ -4,6 +4,7 @@ import bodyParser from 'body-parser'
 import redis from './lib/redis.js'
 import mongodb from './lib/mongodb.js'
 import api from './api/index.js'
+import io from './utils/websocket.js'
 
 const { PORT } = process.env
 
@@ -17,6 +18,10 @@ app.set('mongodb', mongodb)
 
 app.use('/api', api())
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`App listenning on ${PORT}`)
 })
+
+const websocket = io(server)
+
+app.set('websocket', websocket)

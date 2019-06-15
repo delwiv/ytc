@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { TextInput, Button } from "react-native-paper";
+import {API_URL} from 'react-native-dotenv'
 
 const sendUrl = url =>
-  fetch(`http://localhost:3005/api/video`, {
+  fetch(`${API_URL}/api/video`, {
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json"
@@ -21,8 +22,9 @@ export default () => {
         placeholder="Enter a YouTube URL"
       />
       <Button mode="contained" onPress={() => sendUrl(url)}>
-        GO
+        GO {API_URL}
       </Button>
+    
     </>
   );
 };
