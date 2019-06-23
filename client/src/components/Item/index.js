@@ -2,6 +2,7 @@ import React from "react";
 import { Linking, View, Image } from "react-native";
 import RNFetchBlob from "rn-fetch-blob";
 
+import { API_URL } from "react-native-dotenv";
 import {
   Surface,
   ProgressBar,
@@ -42,9 +43,7 @@ const Item = ({
   return (
     <Card>
       <Card.Cover
-        source={
-          thumb ? { uri: thumb } : require("./youtube_social_squircle_red.png")
-        }
+        source={{ uri: thumb || `${API_URL}/static/img/youtube.png` }}
       />
       <Card.Content>
         <Title>{title}</Title>
