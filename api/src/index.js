@@ -19,6 +19,7 @@ app.use(morgan('dev'))
 app.set('redis', redis)
 app.set('mongodb', mongodb)
 
+app.user('/static', express.static('../static'))
 app.use('/api', api())
 
 const server = app.listen(PORT, () => {
