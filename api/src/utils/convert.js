@@ -1,24 +1,25 @@
 import Queue from 'bull'
 import ffmpeg from 'fluent-ffmpeg'
 
+import redis from '../lib/redis.js'
 import Video from '../models/Video.js'
-import { audioDir, videoDir } from '../api/index.js'
+import { audioDir } from '../api/index.js'
 
 const convertQueue = new Queue('convert')
 
-export default async videoId => {
+export default async ({ videoId, websocket }) => {
   console.log('Convert', { videoId })
   const video = await Video.findById(videoId)
-  console.log({ video })
   if (video.status === 'converted') return
+  const { userId } = video
   await video.update({
     status: 'queuedForConvert',
   })
-  await convertQueue.add({ videoId })
+  websocket.emit('itemProgress', userId, { _id: videoId, status: 'queuedForConvert' })
+  await convertQueue.add({ videoId }, { removeOnComplete: true })
   convertQueue
-    .on('progress', (job, data) => {
-      console.log(videoId, data)
-      // websocket.send({...data, step: 'downloading'})
+    .on('progress', (job, progress) => {
+      websocket.emit('itemProgress', userId, { _id: videoId, status: 'converting', ...progress })
     })
     .on('error', err => {
       console.log({ err })
@@ -26,28 +27,31 @@ export default async videoId => {
     .on('completed', async () => {
       console.log('finished')
       await video.update({ status: 'converted' })
-      // websocket.send(...)
+      websocket.emit('itemProgress', userId, { _id: videoId, progress: 1, status: 'converted' })
     })
 }
 
 convertQueue.process(async (job, done) => {
   const { videoId } = job.data
-  console.log({ process: videoId })
   const video = await Video.findById(videoId)
-  console.log({ videoId, video })
   const { videoPath, title } = video
 
   const audioFile = `${audioDir}/${title}.m4a`
 
   await video.update({ audioPath: audioFile, status: 'converting' })
+  await redis.set(`${video._id}_progress`, 0)
 
   ffmpeg(videoPath)
     .noVideo()
     .audioQuality(5)
     .audioCodec('aac')
-    .on('progress', info => {
-      console.log({ info })
-      job.progress(+info.percent.toFixed(2))
+    .on('progress', async info => {
+      const progress = info.percent / 100
+      const prevProgress = await redis.get(`${video._id}_progress`)
+      if (+prevProgress + 0.005 <= progress) {
+        await redis.set(`${video._id}_progress`, progress)
+        job.progress({ progress: +progress.toFixed(2) })
+      }
     })
     .on('error', err => {
       console.log({ err })

@@ -1,9 +1,13 @@
 import io from "socket.io-client";
 import { API_URL } from "react-native-dotenv";
 
-export default () => {
-  const socket = io(API_URL);
-  socket.on("connect", () => {
-    socket.send("hello");
-  });
-};
+import { getUserId } from "./storage";
+
+export default socket = io(API_URL);
+
+const registerUser = userId => socket.emit("registerUser", { userId });
+
+socket.on("connect", async () => {
+  const userId = await getUserId();
+  registerUser(userId);
+});

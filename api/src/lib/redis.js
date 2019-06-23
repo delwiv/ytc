@@ -1,7 +1,7 @@
 import redis from 'redis'
 import bluebird from 'bluebird'
 
-export const MAIN_KEY = 'email.task'
+export const MAIN_KEY = 'ytc'
 
 bluebird.promisifyAll(redis)
 

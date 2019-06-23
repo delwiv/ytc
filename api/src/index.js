@@ -1,5 +1,6 @@
 import express from 'express'
 import bodyParser from 'body-parser'
+import morgan from 'morgan'
 
 import redis from './lib/redis.js'
 import mongodb from './lib/mongodb.js'
@@ -13,6 +14,8 @@ const app = express()
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 
+app.use(morgan('dev'))
+
 app.set('redis', redis)
 app.set('mongodb', mongodb)
 
@@ -23,5 +26,4 @@ const server = app.listen(PORT, () => {
 })
 
 const websocket = io(server)
-
 app.set('websocket', websocket)

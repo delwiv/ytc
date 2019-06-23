@@ -1,46 +1,46 @@
 import React, { Component } from "react";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Platform, StyleSheet, Text, View } from "react-native";
 import { Appbar, Button } from "react-native-paper";
+import { connect } from "react-redux";
 
 import VideoInput from "./components/VideoInput";
 import Item from "./components/Item";
 
-import connectWS from "./utils/websocket";
-import { getUserId } from "./utils/storage";
+import { setUserId } from "./redux/user/actions";
+import {
+  sendUrl,
+  getVideos,
+  updateItemStatus,
+  download
+} from "./redux/videos/actions";
+import websocket, { registerUser } from "./utils/websocket";
 
-const instructions = Platform.select({
-  ios: "Press Cmd+R to reload,\n" + "Cmd+D or shake for dev menu",
-  android:
-    "Double tap R on your keyboard to reload,\n" +
-    "Shake or press menu button for dev menu"
-});
-
-export default class App extends Component {
-  state = {
-    items: [
-      {
-        _id: "5d04d9d58c257a6f4c9b5da2",
-        url: "https://m.youtube.com/watch?v=nLpaOVVFlAM&t=33s",
-        youtubeId: "nLpaOVVFlAM",
-        progress: 100,
-        status: "converted",
-        title: "Kaamelott en Lego - La Botte Secrète 2",
-        videoPath: "/tmp/ytc/video/Kaamelott en Lego - La Botte Secrète 2.webm",
-        audioPath: "/tmp/ytc/audio/Kaamelott en Lego - La Botte Secrète 2.m4a"
-      }
-    ]
-  };
-  componentDidMount() {
-    connectWS();
+class App extends Component {
+  async componentDidMount() {
+    this.props.setUserId();
+    this.websocket = websocket;
+    this.websocket.on("itemProgress", this.props.updateItemStatus);
+  }
+  componentDidUpdate(prevProps) {
+    if (!prevProps.userId && this.props.userId) {
+      this.props.getVideos();
+    }
   }
   render() {
+    const { sendUrl, items, download } = this.props;
     return (
-      <View>
+      <View style={{ flex: 1 }}>
         <Appbar>
           <Appbar.Content title="Converter" />
         </Appbar>
-        <VideoInput />
-        {this.state.items.map(Item)}
+        <VideoInput sendUrl={sendUrl} />
+        <ScrollView>
+          {Object.keys(items)
+            .sort((a, b) => items[a].createdAt - items[b].createdAt)
+            .map(key => (
+              <Item download={download} key={key} {...items[key]} />
+            ))}
+        </ScrollView>
       </View>
     );
   }
@@ -64,3 +64,17 @@ const styles = StyleSheet.create({
     marginBottom: 5
   }
 });
+
+export default connect(
+  state => ({
+    items: state.videos.items,
+    userId: state.user.id
+  }),
+  dispatch => ({
+    setUserId: () => dispatch(setUserId()),
+    getVideos: () => dispatch(getVideos()),
+    updateItemStatus: progress => dispatch(updateItemStatus(progress)),
+    download: params => dispatch(download(params)),
+    sendUrl: params => dispatch(sendUrl(params))
+  })
+)(App);

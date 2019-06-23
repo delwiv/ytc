@@ -6,7 +6,7 @@
   "author": "Delwiv",
   "license": "MIT",
   "scripts": {
-    "start": "node --experimental-modules -r dotenv/config src/index.js",
+    "start": "NODE_DEBUG=bull node --experimental-modules -r dotenv/config src/index.js",
     "dev": "nodemon --delay 500ms --exec \"yarn start\" src"
   },
   "devDependencies": {
@@ -26,9 +26,11 @@
     "express": "^4.17.1",
     "fluent-ffmpeg": "^2.1.2",
     "mongoose": "^5.5.12",
+    "morgan": "^1.9.1",
     "redis": "^2.8.0",
     "sanitize-filename": "^1.6.1",
     "socket.io": "2.1.1",
+    "uuid": "^3.3.2",
     "ws": "^7.0.0",
     "ytdl-core": "^0.29.2"
   }

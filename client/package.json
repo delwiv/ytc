@@ -9,10 +9,15 @@
   },
   "dependencies": {
     "@react-native-community/async-storage": "^1.5.0",
+    "query-string": "^6.7.0",
     "react": "16.8.3",
     "react-native": "0.59.8",
     "react-native-paper": "^2.15.2",
     "react-native-vector-icons": "^6.4.2",
+    "react-redux": "^7.1.0",
+    "redux": "^4.0.1",
+    "redux-thunk": "^2.3.0",
+    "rn-fetch-blob": "git+https://github.com/Ferocia/rn-fetch-blob.git#android-9-open-file",
     "socket.io-client": "2.1.1",
     "uuid": "^3.3.2"
   },
@@ -21,12 +26,14 @@
     "@babel/runtime": "^7.4.5",
     "babel-jest": "^24.8.0",
     "eslint": "^5.16.0",
+    "eslint-config-standard": "^12.0.0",
     "jest": "^24.8.0",
     "metro-react-native-babel-preset": "^0.54.1",
     "prettier": "^1.18.2",
     "react-devtools": "^3.6.1",
     "react-native-dotenv": "^0.2.0",
-    "react-test-renderer": "16.8.3"
+    "react-test-renderer": "16.8.3",
+    "redux-devtools": "^3.5.0"
   },
   "jest": {
     "preset": "react-native"
