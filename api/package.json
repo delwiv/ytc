@@ -23,7 +23,7 @@
     "bluebird": "^3.5.5",
     "bull": "^3.10.0",
     "dotenv": "^8.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "fluent-ffmpeg": "^2.1.2",
     "mongoose": "^5.5.12",
     "morgan": "^1.9.1",
